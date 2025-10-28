@@ -1,0 +1,82 @@
+﻿@model IEnumerable<MinimalAPI.Data.Models.Task>
+@using System.Text.Json
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Tickets</h1>
+
+    <div class="row mb-4">
+        <div class="col">
+            <div class="border border-1 bg-body-secondary rounded-2 border-dark-subtle p-4">
+                <span> Number of Tickets </span>
+                <span>@Model.Count()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="mb-4 text-center">
+            <button id="addTicketBtn" class="btn btn-primary">+ Add Ticket</button>
+        </div>
+
+        <div id="addTicketForm" class="container mb-4 d-none">
+            <div class="row justify-content-center">
+                <div class="col-6 border p-3 rounded bg-light">
+                    <h5 class="mb-3">New Ticket</h5>
+                    <input id="newName" type="text" class="form-control mb-2" placeholder="Name" />
+                    <textarea id="newDescription" class="form-control mb-2" placeholder="Description"></textarea>
+                    <input id="createdBy" type="text" class="form-control mb-2" placeholder="Reporter email" />
+                    <button id="saveTicketBtn" class="btn btn-success">Save</button>
+                    <button id="cancelTicketBtn" class="btn btn-outline-danger">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row gap-2 justify-content-center">
+            @foreach (var item in Model)
+            {
+                <div id="ticket-@item.Id" class="col-3 border border-1 bg-body-secondary rounded-2 border-light-subtle py-4 px-3">
+                    <div class="row justify-content-between align-items-center">
+                        <span class="col text-dark text-start ps-3">Ticket Id# @item.Id</span>
+                        <div class="col text-end">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">...</button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" data-id="@item.Id" id="edit-@item.Id" href="#">Edit</a></li>
+                                <li><a class="dropdown-item" href="#" data-id="@item.Id" id="delete-@item.Id">Delete</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                   @*  <div class="col d-flex w-100 ">
+                        @if (item.Status)
+                        {
+                            <div class="p-1 bg-success border rounded-2 text-light border-success-subtle w-50" id="status-open-@item.Id">Open</div>
+                        }
+                        else
+                        {
+                            <div class="p-1 bg-danger border rounded-2 text-light border-danger-subtle w-50" id="status-close-@item.Id">Closed</div>
+                        }
+                    </div> *@
+
+                    <div class="row mt-3 fw-bold">
+                        <p data-field="name" id="name-@item.Id">@item.Name</p>
+                    </div>
+                    <div class="row">
+                        <p data-field="description" id="description-@item.Id">@item.Description</p>
+                    </div>
+                    <div class="row text-dark justify-content-between mt-2">
+                        <span class="col font-xs text-center" id="createdBy-@item.Id">Created by: @item.CreatedAt</span>
+                    </div>
+
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    window.ticketsData = @Html.Raw(JsonSerializer.Serialize(Model));
+</script>
+
+<script src="~/js/tickets.js"></script>
