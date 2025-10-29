@@ -6,5 +6,6 @@ namespace MVC.Models
     {
         public string Title { get; set; } = "Tickets";
         public IEnumerable<TaskModel> Tickets { get; set; } = [];
+        public TaskModel? NewTask { get; set; } 
     }
 }

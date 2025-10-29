@@ -1,142 +1,138 @@
-﻿//esto es que lo estaba haciendo con etiquetas pero por tiempo lo tuve que pasar asi sino agrego todo con funciones jajajaja
-
-document.addEventListener("DOMContentLoaded", function () {
+﻿$(function () {
     const tickets = window.ticketsData || [];
 
-    document.querySelectorAll('[id^="edit-"]').forEach(button => {
-        button.addEventListener("click", function (e) {
-            e.preventDefault();
+    // Update Ticket
+    $('[id^="edit-"]').on('click', function (e) {
+        e.preventDefault();
 
-            const id = parseInt(button.id.split("-")[1]);
-            const nameEl = document.getElementById(`name-${id}`);
-            const descEl = document.getElementById(`description-${id}`);
-            const card = document.getElementById(`ticket-${id}`);
+        const $btn = $(this);
+        const id = parseInt($btn.attr('id').split('-')[1]);
+        const $nameEl = $(`#name-${id}`);
+        const $descEl = $(`#description-${id}`);
+        const $card = $(`#ticket-${id}`);
 
-            let ticket = null;
-            for (let i = 0; i < tickets.length; i++) {
-                if (tickets[i].id === id || tickets[i].Id === id) {
-                    ticket = tickets[i];
-                    break;
-                }
+        let ticket = tickets.find(t => t.id === id || t.Id === id);
+        const editing = $card.data('editing') === true;
+
+        if (!editing) {
+            const nameVal = $.trim($nameEl.text());
+            const descVal = $.trim($descEl.text());
+
+            $nameEl.html(`<input id="input-name-${id}" class="form-control form-control-sm" value="${nameVal}" />`);
+            $descEl.html(`<textarea id="input-desc-${id}" class="form-control form-control-sm" rows="2">${descVal}</textarea>`);
+
+            $btn.text('Save');
+            $card.data('editing', true);
+        } else {
+            const newName = $(`#input-name-${id}`).val();
+            const newDesc = $(`#input-desc-${id}`).val();
+
+            $nameEl.text(newName);
+            $descEl.text(newDesc);
+            $btn.text('Edit');
+            $card.data('editing', false);
+
+            if (!ticket) {
+                console.error("Ticket no encontrado para actualizar");
+                return;
             }
 
-            const editing = card.dataset.editing === "true";
-
-            if (!editing) {
-                const nameVal = nameEl.innerText.trim();
-                const descVal = descEl.innerText.trim();
-
-                nameEl.innerHTML = `<input id="input-name-${id}" class="form-control form-control-sm" value="${nameVal}" />`;
-                descEl.innerHTML = `<textarea id="input-desc-${id}" class="form-control form-control-sm" rows="2">${descVal}</textarea>`;
-
-                button.innerText = "Save";
-                card.dataset.editing = "true";
-            } else {
-                const newName = document.getElementById(`input-name-${id}`).value;
-                const newDesc = document.getElementById(`input-desc-${id}`).value;
-
-                nameEl.innerHTML = newName;
-                descEl.innerHTML = newDesc;
-                button.innerText = "Edit";
-                card.dataset.editing = "false";
-
-                if (!ticket) {
-                    console.error("Ticket no encontrado para actualizar");
-                    return;
+            $.ajax({
+                url: `https://localhost:7169/api/Task/${id}`,
+                type: "PUT",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    id: ticket.id ?? ticket.Id,
+                    name: newName,
+                    description: newDesc,
+                    createdBy: ticket.createdBy ?? ticket.CreatedBy,
+                    createdDate: ticket.createdDate ?? ticket.CreatedDate,
+                    status: ticket.status ?? ticket.Status
+                }),
+                success: function () {
+                    alert("Ticket updated!");
+                },
+                error: function () {
+                    alert("Error updating ticket");
                 }
+            });
+        }
+    });
 
-                fetch(`https://localhost:7169/api/Tickets/${id}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        id: ticket.id ?? ticket.Id,
-                        name: newName,
-                        description: newDesc,
-                        createdBy: ticket.createdBy ?? ticket.CreatedBy,
-                        createdDate: ticket.createdDate ?? ticket.CreatedDate,
-                        status: ticket.status ?? ticket.Status
-                    })
-                })
-                    .then(r => r.ok ? alert("Ticket updated!") : alert("Error updating ticket"))
-                    .catch(err => console.error("Error:", err));
+    // --- delete ticket ---
+    $('[id^="delete-"]').on('click', function (e) {
+        e.preventDefault();
+
+        const id = parseInt($(this).data('id'));
+        if (!confirm(`Are you sure you want to delete ticket #${id}?`)) return;
+
+        $.ajax({
+            url: `https://localhost:7169/api/Task/${id}`,
+            type: "DELETE",
+            success: function () {
+                alert(`Ticket #${id} deleted!`);
+                $(`#ticket-${id}`).remove();
+            },
+            error: function () {
+                alert("Error deleting ticket");
             }
         });
     });
 
-     //Eliminar
-    document.querySelectorAll('[id^="delete-"]').forEach(button => {
-        button.addEventListener("click", function (e) {
-            e.preventDefault();
+    // --- add ticket ---
+    const $addBtn = $('#addTicketBtn');
+    const $form = $('#addTicketForm');
+    const $saveBtn = $('#saveTicketBtn');
+    const $cancelBtn = $('#cancelTicketBtn');
 
-            const id = parseInt(button.dataset.id);
-            const confirmDelete = confirm(`Are you sure you want to delete ticket #${id}?`);
-
-            if (!confirmDelete) return;
-
-            fetch(`https://localhost:7169/api/Tickets/${id}`, {
-                method: "DELETE"
-            })
-                .then(r => {
-                    if (r.ok) {
-                        alert(`Ticket #${id} deleted!`);
-                        const card = document.getElementById(`ticket-${id}`);
-                        if (card) card.remove(); 
-                    } else {
-                        alert("Error deleting ticket");
-                    }
-                })
-                .catch(err => {
-                    console.error("Delete error:", err);
-                    alert(" Could not connect to the API");
-                });
-        });
+    $addBtn.on('click', function () {
+        $form.removeClass('d-none');
+        $addBtn.addClass('d-none');
     });
 
-    const addBtn = document.getElementById("addTicketBtn");
-    const form = document.getElementById("addTicketForm");
-    const saveBtn = document.getElementById("saveTicketBtn");
-    const cancelBtn = document.getElementById("cancelTicketBtn");
-
-    addBtn?.addEventListener("click", () => {
-        form.classList.remove("d-none");
-        addBtn.classList.add("d-none");
+    $cancelBtn.on('click', function () {
+        $form.addClass('d-none');
+        $addBtn.removeClass('d-none');
     });
 
-    cancelBtn?.addEventListener("click", () => {
-        form.classList.add("d-none");
-        addBtn.classList.remove("d-none");
-    });
-
-    saveBtn?.addEventListener("click", async () => {
-        const name = document.getElementById("newName").value.trim();
-        const description = document.getElementById("newDescription").value.trim();
-        let createdBy = document.getElementById("createdBy").value.trim();
+    $saveBtn.on('click', async function () {
+        const name = $.trim($('#newName').val());
+        const description = $.trim($('#newDescription').val());
+        const dueDate = $.trim($('#dueDate').val());
 
         if (!name || !description) {
             alert("Please fill out all fields");
             return;
         }
 
-        if (createdBy.length === 0) {
-            createdBy = "Computer";
-        }
-
         try {
-            const response = await fetch("https://localhost:7169/api/Tickets", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({id:0, name, description, createdBy, createdDate: new Date(), status:false})
+            await $.ajax({
+                url: 'api/Home/AddTask',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    Id: 0,
+                    Name: name,
+                    Description: description,
+                    CreatedAt: new Date(),
+                    Status: false,
+                    DueDate: dueDate,
+                    Approved: null,
+                }),
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error:", error);
+                }
             });
 
-            if (response.ok) {
-                alert("Ticket added!");
-                location.reload();
-            } else {
-                alert("Error adding ticket");
-            }
+            location.reload();
         } catch (err) {
             console.error(err);
-            alert("Connection error");
+            alert("Error adding ticket");
         }
     });
 });

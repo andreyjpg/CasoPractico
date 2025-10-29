@@ -22,11 +22,6 @@ namespace MinimalAPI.API.Controllers
             return await userBusiness.GetByIdAsync(id);
         }
 
-        [HttpPost]
-        public async Task<User> login([FromBody] string password, [FromBody] string email)
-        {
-            return await userBusiness.GetByCredentialsAsync(email, password);
-        }
 
     }
 }

@@ -22,7 +22,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 //TODO add scope for ItaskBusiness
-//builder.Services.AddScoped<ITaskBusiness, TaskBusiness>();
+builder.Services.AddScoped<ITaskBusiness, TaskBusiness>();
+builder.Services.AddScoped<IRoleBusiness, RoleBusiness>();
+builder.Services.AddScoped<IUserBusiness, UserBusiness>();
+builder.Services.AddScoped<IUserRoleBusiness, UserRoleBusiness>();
+
 builder.Services.AddScoped<IRepositoryTask, RepositoryTask>();
 builder.Services.AddScoped<IRepositoryUser, RepositoryUser>();
 builder.Services.AddScoped<IRepositoryRole, RepositoryRole>();

@@ -6,6 +6,10 @@ builder.Services.AddHttpClient("MinimalAPI", client =>
 {
     client.BaseAddress = new Uri("https://localhost:7136/");
 });
+builder.Services.AddHttpClient("API", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7169/");
+});
 
 builder.Services.AddCors(options =>
 {
@@ -38,7 +42,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=Login}/{action=Index}/{id?}")
     .WithStaticAssets();
 
 

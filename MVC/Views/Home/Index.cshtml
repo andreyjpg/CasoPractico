@@ -27,7 +27,7 @@
                     <h5 class="mb-3">New Ticket</h5>
                     <input id="newName" type="text" class="form-control mb-2" placeholder="Name" />
                     <textarea id="newDescription" class="form-control mb-2" placeholder="Description"></textarea>
-                    <input id="createdBy" type="text" class="form-control mb-2" placeholder="Reporter email" />
+                    <input id="dueDate" type="date" class="form-control mb-2" placeholder="Reporter email" />
                     <button id="saveTicketBtn" class="btn btn-success">Save</button>
                     <button id="cancelTicketBtn" class="btn btn-outline-danger">Cancel</button>
                 </div>
@@ -79,4 +79,5 @@
     window.ticketsData = @Html.Raw(JsonSerializer.Serialize(Model));
 </script>
 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="~/js/tickets.js"></script>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace MinimalAPI.Model;
 
@@ -13,5 +14,6 @@ public partial class UserRole
 
     public virtual Role Role { get; set; } = null!;
 
+    [JsonIgnore]
     public virtual User User { get; set; } = null!;
 }
