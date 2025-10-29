@@ -3,11 +3,36 @@
 @model RolesViewModel
 @{
     ViewData["Title"] = "Role Page";
+    var showAddRoleForm = !ViewData.ModelState.IsValid && Model != null && !string.IsNullOrWhiteSpace(Model.NewRoleName);
 }
 
 <div class="text-center">
 
     <h1 class="display-4">Users Signed in</h1>
+
+    <div class="container mb-4">
+        <div class="mb-4 text-center">
+            <button id="addRoleBtn" class="btn btn-primary @(showAddRoleForm ? "d-none" : string.Empty)">+ Add Role</button>
+        </div>
+
+        <div id="addRoleForm" class="container mb-4 @(showAddRoleForm ? string.Empty : "d-none")">
+            <div class="row justify-content-center">
+                <div class="col-6 border p-3 rounded bg-light">
+                    <form asp-controller="Roles" asp-action="CreateRole" method="post">
+                        @Html.AntiForgeryToken()
+                        <h5 class="mb-3">New Role</h5>
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input asp-for="NewRoleName" id="newRoleName" type="text" class="form-control mb-2" placeholder="Role name" />
+                        <span asp-validation-for="NewRoleName" class="text-danger d-block text-start mb-2"></span>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <button type="submit" id="saveRoleBtn" class="btn btn-success">Save</button>
+                            <button type="button" id="cancelRoleBtn" class="btn btn-outline-danger">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div>
         <table class="table table-striped table-hover align-middle">
@@ -56,3 +81,33 @@
     </div>
 </div>
 
+<script>
+    (function () {
+        const addButton = document.getElementById('addRoleBtn');
+        const formContainer = document.getElementById('addRoleForm');
+        const cancelButton = document.getElementById('cancelRoleBtn');
+        const roleInput = document.getElementById('newRoleName');
+
+        if (!addButton || !formContainer || !cancelButton) {
+            return;
+        }
+
+        addButton.addEventListener('click', function (event) {
+            event.preventDefault();
+            formContainer.classList.remove('d-none');
+            addButton.classList.add('d-none');
+            if (roleInput) {
+                roleInput.focus();
+            }
+        });
+
+        cancelButton.addEventListener('click', function (event) {
+            event.preventDefault();
+            formContainer.classList.add('d-none');
+            addButton.classList.remove('d-none');
+            if (roleInput) {
+                roleInput.value = '';
+            }
+        });
+    })();
+</script>

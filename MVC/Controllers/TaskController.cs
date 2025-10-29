@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace MinimalAPI.MVC.Controllers
 {
@@ -6,9 +7,14 @@ namespace MinimalAPI.MVC.Controllers
     {
         public IActionResult Approvals()
         {
-            var roleId = TempData["RoleId"] != null ? System.Convert.ToInt32(TempData["RoleId"]) : 0;
-            TempData.Keep("RoleId");
-            if (roleId != 1)
+            var roleName = TempData["RoleName"]?.ToString();
+            if (TempData.ContainsKey("RoleName"))
+            {
+                TempData.Keep("RoleName");
+            }
+
+            if (!(string.Equals(roleName, "Admin", StringComparison.OrdinalIgnoreCase) ||
+                  string.Equals(roleName, "Manager", StringComparison.OrdinalIgnoreCase)))
             {
                 return RedirectToAction("Index", "Home");
             }
