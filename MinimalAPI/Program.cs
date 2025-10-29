@@ -17,7 +17,7 @@ var app = builder.Build();
 
 
 app.MapGet("/api/task", async (TaskDbContext db) =>
-    await db.Tasks.ToListAsync());
+    await db.Tasks.Where(task => task.Approved != null).OrderBy(task => task.CreatedAt).ToListAsync());
 
 app.MapPost("/login", async ([FromBody] string request, [FromServices] TaskDbContext db) =>
 {

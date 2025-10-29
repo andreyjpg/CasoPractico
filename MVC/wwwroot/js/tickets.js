@@ -95,44 +95,4 @@
         $addBtn.removeClass('d-none');
     });
 
-    $saveBtn.on('click', async function () {
-        const name = $.trim($('#newName').val());
-        const description = $.trim($('#newDescription').val());
-        const dueDate = $.trim($('#dueDate').val());
-
-        if (!name || !description) {
-            alert("Please fill out all fields");
-            return;
-        }
-
-        try {
-            await $.ajax({
-                url: 'api/Home/AddTask',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    Id: 0,
-                    Name: name,
-                    Description: description,
-                    CreatedAt: new Date(),
-                    Status: false,
-                    DueDate: dueDate,
-                    Approved: null,
-                }),
-                success: function (response) {
-                    if (response.success) {
-                        alert(response.message);
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.error("Error:", error);
-                }
-            });
-
-            location.reload();
-        } catch (err) {
-            console.error(err);
-            alert("Error adding ticket");
-        }
-    });
 });

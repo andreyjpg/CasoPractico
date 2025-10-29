@@ -8,15 +8,11 @@ using TaskModel = MinimalAPI.Data.Models.Task;
 
 namespace MVC.Controllers
 {
-    public class ApiResponse
-    {
-        public bool Success { get; set; }
-        public string? Message { get; set; }
-    }
     public class HomeController : Controller
     {
         private readonly HttpClient _httpClientMinimal;
         private readonly HttpClient _httpClientAPI;
+        private readonly HomeViewModel _homeViewModel;
 
 
 
@@ -24,6 +20,7 @@ namespace MVC.Controllers
         {
             _httpClientMinimal = factory.CreateClient("MinimalAPI");
             _httpClientAPI = factory.CreateClient("API");
+            _homeViewModel = new HomeViewModel();
 
         }
 
@@ -31,34 +28,37 @@ namespace MVC.Controllers
         public async Task<IActionResult> Index()
         {
             var tickets = await _httpClientMinimal.GetFromJsonAsync<List<TaskModel>>("api/task");
-            return View(tickets);
+            _homeViewModel.Tickets = tickets;
+            return View(_homeViewModel);
         }
 
         [HttpPost]
-        public async Task<ActionResult<ApiResponse>> AddTask([FromBody] TaskModel newModel)
+        public async Task<ActionResult<ApiResponse>> AddTask(HomeViewModel newModel)
         {
             if (newModel == null)
             {
                 return View();
             }
-            //var model = JsonSerializer.Deserialize<TaskModel>(newModel);
+            newModel.NewTask.CreatedAt = DateTime.Now;
             try
             {
-                var response = await _httpClientAPI.PostAsJsonAsync("api/Task", newModel);
+                var json = JsonSerializer.Serialize(newModel.NewTask);  
+                var response = await _httpClientAPI.PostAsJsonAsync("api/Task", json);
                 if (response.IsSuccessStatusCode)
                 {
                     var result = await response.Content.ReadFromJsonAsync<bool>();
-                    return new ApiResponse { Message = "Task created!", Success = result };
+                    _homeViewModel.ApiResponse = new ApiResponse { Message = "Task created!", Success = result };
                 }
                 else
                 {
-                    return new ApiResponse { Message = "Task creation failed!", Success = false };
+                    _homeViewModel.ApiResponse = new ApiResponse { Message = "Task creation failed!", Success = false };
                 }
             }
             catch (Exception ex)
             {
                 throw ex;
             }
+            return RedirectToAction("Index", "Home", _homeViewModel);
         }
 
     }

@@ -3,6 +3,7 @@ using MinimalAPI.Core.BusinessLogic;
 using TaskModel = MinimalAPI.Data.Models.Task;
 using System.Threading.Tasks;
 using MinimalAPI.Data.Repositories;
+using System.Text.Json;
 
 namespace MinimalAPI.API.Controllers
 {
@@ -24,13 +25,14 @@ namespace MinimalAPI.API.Controllers
         }
 
         [HttpPost]
-        public async Task<bool> CreateAsync(TaskModel entity)
+        public async Task<bool> CreateAsync([FromBody] string entity)
         {
-            if (entity == null)
+            var model = JsonSerializer.Deserialize<TaskModel>(entity);
+            if (model == null)
             {
                 throw new ArgumentNullException(nameof(entity));
             }
-            return await taskBusiness.CreateAsync(entity);
+            return await taskBusiness.CreateAsync(model);
         }
 
         public Task<bool> SaveTaskAsync(TaskModel entity)
