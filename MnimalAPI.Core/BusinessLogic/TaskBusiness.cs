@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TaskModel = MinimalAPI.Data.Models.Task;
 using MinimalAPI.Data.Repositories;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace MinimalAPI.Core.BusinessLogic
 {
@@ -12,6 +13,7 @@ namespace MinimalAPI.Core.BusinessLogic
         Task<TaskModel> GetByIdAsync(int id);
         Task<bool> SaveTaskAsync(TaskModel Task);
         Task<bool> CreateAsync(TaskModel task);
+        Task<bool> DeleteAsync(int id);
         Task<bool> ApproveTaskAsync(int id);
         Task<bool> DenyTaskAsync(int id);
     }
@@ -43,6 +45,12 @@ namespace MinimalAPI.Core.BusinessLogic
         public Task<bool> SaveTaskAsync(TaskModel entity)
         {
             return _repository.UpdateAsync(entity);
+        }
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            var entity = await _repository.FindAsync(id); 
+            return await _repository.DeleteAsync(entity);
         }
 
         // Bloque de aprobaciones y denegaciones por restricciones de tiempo

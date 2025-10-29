@@ -11,7 +11,7 @@
         const $descEl = $(`#description-${id}`);
         const $card = $(`#ticket-${id}`);
 
-        let ticket = tickets.find(t => t.id === id || t.Id === id);
+        let ticket = tickets.Tickets.find(t => t.id === id || t.Id === id);
         const editing = $card.data('editing') === true;
 
         if (!editing) {
@@ -38,7 +38,7 @@
             }
 
             $.ajax({
-                url: `https://localhost:7169/api/Task/${id}`,
+                url: `https://localhost:7169/api/Task`,
                 type: "PUT",
                 contentType: "application/json",
                 data: JSON.stringify({
@@ -47,7 +47,8 @@
                     description: newDesc,
                     createdBy: ticket.createdBy ?? ticket.CreatedBy,
                     createdDate: ticket.createdDate ?? ticket.CreatedDate,
-                    status: ticket.status ?? ticket.Status
+                    status: ticket.status ?? ticket.Status,
+                    Approval: ticket.Approval ?? ticket.Approval
                 }),
                 success: function () {
                     alert("Ticket updated!");

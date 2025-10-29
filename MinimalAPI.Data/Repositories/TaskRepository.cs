@@ -15,6 +15,7 @@ namespace MinimalAPI.Data.Repositories
         Task<IEnumerable<TaskModel>> ReadAsync();
         Task<TaskModel> FindAsync(int id);
         Task<bool> UpdateAsync(TaskModel entity);
+        Task<bool> DeleteAsync(TaskModel id);
         Task<bool> ApproveAsync(int id);
         Task<bool> DenyAsync(int id);
     }
