@@ -6,6 +6,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MinimalAPI.MVC.Controllers
 {
@@ -28,11 +31,13 @@ namespace MinimalAPI.MVC.Controllers
     public class LoginController : Controller
     {
         private readonly HttpClient _httpClient;
+        private readonly HttpClient _roleClient;
 
 
         public LoginController(IHttpClientFactory factory)
         {
             _httpClient = factory.CreateClient("MinimalAPI");
+            _roleClient = factory.CreateClient("API");
         }
 
         [HttpGet]
@@ -54,11 +59,31 @@ namespace MinimalAPI.MVC.Controllers
                 throw new Exception("Email or Password are incorrect");
             }
             var response = await user.Content.ReadFromJsonAsync<LoginResponse>();
-            TempData["UserId"] = response.Data.UserId;
-            TempData["UserName"] = response.Data.FullName;
-            TempData["RoleId"] = response.Data.UserRoles.FirstOrDefault().RoleId;
-            TempData["Email"] = response.Data.Email;
-            
+            var primaryRole = response?.Data?.UserRoles?.FirstOrDefault();
+            string? roleName = null;
+
+            if (primaryRole != null)
+            {
+                try
+                {
+                    var roles = await _roleClient.GetFromJsonAsync<List<Role>>("api/Role");
+                    roleName = roles?.FirstOrDefault(r => r.RoleId == primaryRole.RoleId)?.RoleName;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to resolve role name: {ex.Message}");
+                }
+            }
+
+            TempData["UserId"] = response?.Data?.UserId;
+            TempData["UserName"] = response?.Data?.FullName;
+            TempData["RoleId"] = primaryRole?.RoleId;
+            TempData["Email"] = response?.Data?.Email;
+            if (!string.IsNullOrWhiteSpace(roleName))
+            {
+                TempData["RoleName"] = roleName;
+            }
+
 
             return RedirectToAction("Index", "Home");
         }
