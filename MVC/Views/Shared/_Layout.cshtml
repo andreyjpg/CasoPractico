@@ -25,13 +25,18 @@
                         </li>
                         @* //Boton de Approvals solamente es visible para usuarios con role "Admin" o "Manager" *@
                         @{
-                            int? roleId = null;
-                            if (TempData.ContainsKey("RoleId"))
+                            string? roleName = null;
+                            if (TempData.ContainsKey("RoleName"))
                             {
-                                roleId = System.Convert.ToInt32(TempData["RoleId"]);
+                                roleName = TempData["RoleName"]?.ToString();
+                                TempData.Keep("RoleName");
+                            }
+                            else if (TempData.ContainsKey("RoleId"))
+                            {
                                 TempData.Keep("RoleId");
                             }
-                            bool canSeeApprovals = roleId == 1; // Manager or System Admin
+                            bool canSeeApprovals = string.Equals(roleName, "Admin", StringComparison.OrdinalIgnoreCase)
+                                || string.Equals(roleName, "Manager", StringComparison.OrdinalIgnoreCase);
                         }
 
                         @if (canSeeApprovals)

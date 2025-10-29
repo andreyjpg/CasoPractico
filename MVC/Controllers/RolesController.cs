@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MinimalAPI.Data.Models;
 using MinimalAPI.MVC.Models;
 using System.Text.Json;
+using System.Threading.Tasks;
+using Role = MinimalAPI.Data.Models.Role;
+using User = MinimalAPI.Data.Models.User;
+using UserRole = MinimalAPI.Data.Models.UserRole;
 
 namespace MinimalAPI.MVC.Controllers
 {
@@ -17,11 +20,7 @@ namespace MinimalAPI.MVC.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            var users = await _httpClientAPI.GetFromJsonAsync<List<User>>("api/User");
-            _rolesViewModel.Users = users;
-
-            var roles = await _httpClientAPI.GetFromJsonAsync<List<Role>>("api/Role");
-            _rolesViewModel.Roles = roles;
+            await PopulateViewModelAsync();
             return View(_rolesViewModel);
         }
 
@@ -35,6 +34,45 @@ namespace MinimalAPI.MVC.Controllers
 
             var response = await _httpClientAPI.PostAsJsonAsync("api/UserRole", json);
             return RedirectToAction("Index", "Roles", _rolesViewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateRole(RolesViewModel model)
+        {
+            if (string.IsNullOrWhiteSpace(model.NewRoleName))
+            {
+                ModelState.AddModelError(nameof(model.NewRoleName), "Role name is required.");
+                await PopulateViewModelAsync();
+                _rolesViewModel.NewRoleName = model.NewRoleName;
+                return View("Index", _rolesViewModel);
+            }
+
+            var newRole = new Role
+            {
+                RoleName = model.NewRoleName.Trim()
+            };
+
+            var response = await _httpClientAPI.PostAsJsonAsync("api/Role", newRole);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ModelState.AddModelError(nameof(model.NewRoleName), "Unable to create role. Please try again.");
+                await PopulateViewModelAsync();
+                _rolesViewModel.NewRoleName = model.NewRoleName;
+                return View("Index", _rolesViewModel);
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        private async Task PopulateViewModelAsync()
+        {
+            var users = await _httpClientAPI.GetFromJsonAsync<List<User>>("api/User") ?? new List<User>();
+            var roles = await _httpClientAPI.GetFromJsonAsync<List<Role>>("api/Role") ?? new List<Role>();
+
+            _rolesViewModel.Users = users;
+            _rolesViewModel.Roles = roles;
         }
     }
 }
