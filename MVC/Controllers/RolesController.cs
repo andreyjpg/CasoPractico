@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Data.Models;
 using MinimalAPI.MVC.Models;
+using MVC.Models;
 using System.Text.Json;
 
 namespace MinimalAPI.MVC.Controllers
@@ -35,6 +36,15 @@ namespace MinimalAPI.MVC.Controllers
 
             var response = await _httpClientAPI.PostAsJsonAsync("api/UserRole", json);
             return RedirectToAction("Index", "Roles", _rolesViewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddRole(RolesViewModel viewModel)
+        {
+            var json = JsonSerializer.Serialize(viewModel.NewRole);
+            var result = await _httpClientAPI.PostAsJsonAsync("api/Role", json);
+            return RedirectToAction("Index", "Roles", _rolesViewModel);
+
         }
     }
 }

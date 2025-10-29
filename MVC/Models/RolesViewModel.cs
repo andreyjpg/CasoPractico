@@ -7,6 +7,8 @@ namespace MinimalAPI.MVC.Models
         public IEnumerable<User> Users { get; set; } = new List<User>();
         public IEnumerable<Role> Roles { get; set; } = new List<Role>();
 
+        public Role? NewRole { get; set; } 
+
     }
 
 }
