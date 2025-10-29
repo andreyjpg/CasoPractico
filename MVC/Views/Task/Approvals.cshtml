@@ -1,0 +1,24 @@
+﻿@{
+    ViewData["Title"] = "Aprobaciones";
+}
+
+<h2 class="mb-4">Panel de Aprobaciones</h2>
+
+<table class="table table-bordered table-striped" id="approvalsTable">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Estado</th>
+            <th>Fecha de Creación</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody id="approvalsBody">
+    </tbody>
+</table>
+
+@section Scripts {
+    <script src="~/js/approvals.js"></script>
+}

@@ -11,7 +11,6 @@ namespace MinimalAPI.API.Controllers
     [ApiController]
     public class TaskController(ITaskBusiness taskBusiness) : ControllerBase
     {
-
         [HttpGet]
         public async Task<IEnumerable<TaskModel>> GetAsync()
         {
@@ -35,13 +34,36 @@ namespace MinimalAPI.API.Controllers
             return await taskBusiness.CreateAsync(model);
         }
 
-        public Task<bool> SaveTaskAsync(TaskModel entity)
+        [HttpPut]
+        public Task<bool> SaveTaskAsync([FromBody] TaskModel entity)
         {
             if (entity == null)
             {
                 throw new ArgumentNullException(nameof(entity));
             }
             return taskBusiness.SaveTaskAsync(entity);
+        }
+
+        [HttpPut("Approve/{id}")]
+        public async Task<IActionResult> ApproveTask(int id)
+        {
+            var result = await taskBusiness.ApproveTaskAsync(id);
+
+            if (!result)
+                return BadRequest("No se puede aprobar esta tarea (ya fue denegada hace más de 24h o no existe).");
+
+            return Ok("Tarea aprobada correctamente.");
+        }
+
+        [HttpPut("Deny/{id}")]
+        public async Task<IActionResult> DenyTask(int id)
+        {
+            var result = await taskBusiness.DenyTaskAsync(id);
+
+            if (!result)
+                return BadRequest("No se pudo denegar la tarea (no existe o error en la base de datos).");
+
+            return Ok("Tarea denegada correctamente.");
         }
     }
 }
