@@ -46,9 +46,10 @@
                     name: newName,
                     description: newDesc,
                     createdBy: ticket.createdBy ?? ticket.CreatedBy,
-                    createdDate: ticket.createdDate ?? ticket.CreatedDate,
+                    createdDate: ticket.createdAt ?? ticket.CreatedAt,
                     status: ticket.status ?? ticket.Status,
-                    Approval: ticket.Approval ?? ticket.Approval
+                    approval: ticket.Approved ?? ticket.approved,
+                    dueDate: ticket.DueDate
                 }),
                 success: function () {
                     alert("Ticket updated!");
