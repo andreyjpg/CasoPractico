@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Core.BusinessLogic;
 using MinimalAPI.Data.Models;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace MinimalAPI.API.Controllers
@@ -18,13 +19,15 @@ namespace MinimalAPI.API.Controllers
         
 
         [HttpPost]
-        public async Task<bool> CreateAsync(Role entity)
+        public async Task<bool> CreateAsync([FromBody] string entity)
         {
-            if (entity == null)
+            var model = JsonSerializer.Deserialize<Role>(entity);
+
+            if (model == null)
             {
                 throw new ArgumentNullException(nameof(entity));
             }
-            return await RoleBusiness.CreateAsync(entity);
+            return await RoleBusiness.CreateAsync(model);
         }
     }
 }
