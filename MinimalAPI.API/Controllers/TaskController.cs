@@ -44,7 +44,7 @@ namespace MinimalAPI.API.Controllers
             return taskBusiness.SaveTaskAsync(entity);
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public Task<bool> DeleteTaskAsync(int id) 
         {
             return taskBusiness.DeleteAsync(id);
