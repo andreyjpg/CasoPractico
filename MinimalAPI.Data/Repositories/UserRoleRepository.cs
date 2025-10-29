@@ -14,6 +14,8 @@ namespace MinimalAPI.Data.Repositories
         Task<bool> UpdateAsync(UserRole entity);
         Task<IEnumerable<UserRole>> ReadAsync();
         Task<UserRole> FindAsyncByUserId(int userId);
+        Task<bool> AssignRole(UserRole entity);
+
     }
 
     public class RepositoryUserRole : RepositoryBase<UserRole>, IRepositoryUserRole
@@ -40,5 +42,31 @@ namespace MinimalAPI.Data.Repositories
             }
 
         }
+
+        public async Task<bool> AssignRole(UserRole entity)
+        {
+            try
+            {
+                var existing = await _context.UserRoles
+                    .FirstOrDefaultAsync(ur => ur.UserId == entity.UserId);
+
+                if (existing != null)
+                {
+                    _context.UserRoles.Remove(existing);
+                    await _context.SaveChangesAsync();
+                }
+
+                var newUserRole = new UserRole { UserId = entity.UserId, RoleId = entity.RoleId };
+                await _context.UserRoles.AddAsync(newUserRole);
+                await _context.SaveChangesAsync();
+                return true;
+            } catch (Exception ex)
+            {
+                return false;
+            }
+            
+
+        }
+
     }
 }

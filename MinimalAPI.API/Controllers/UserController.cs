@@ -22,6 +22,5 @@ namespace MinimalAPI.API.Controllers
             return await userBusiness.GetByIdAsync(id);
         }
 
-
     }
 }

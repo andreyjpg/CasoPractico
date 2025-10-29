@@ -11,31 +11,16 @@ namespace MinimalAPI.Core.BusinessLogic
 {
     public interface IUserRoleBusiness
     {
-        Task<bool> CreateAsync(UserRole entity);
-        Task<bool> UpdateAsync(UserRole entity);
-
-        Task<IEnumerable<UserRole>> ReadAsync();
-        Task<UserRole> FindAsyncByUserId(int userId);
+        Task<bool> AssignRole(UserRole entity);
 
     }
 
     public class UserRoleBusiness(IRepositoryUserRole repository) : IUserRoleBusiness
     {
-        public Task<bool> CreateAsync(UserRole entity)
+        public Task<bool> AssignRole(UserRole entity)
         {
-            return repository.CreateAsync(entity);
+            return repository.AssignRole(entity);
         }
-        public Task<bool> UpdateAsync(UserRole entity)
-        {
-            return repository.UpdateAsync(entity);
-        }
-        public Task<IEnumerable<UserRole>> ReadAsync()
-        {
-            return repository.ReadAsync();
-        }
-        public Task<UserRole> FindAsyncByUserId(int userId)
-        {
-            return repository.FindAsyncByUserId(userId);
-        }
+        
     }
 }
